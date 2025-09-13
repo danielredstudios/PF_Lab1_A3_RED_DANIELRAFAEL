@@ -59,7 +59,7 @@ namespace MoodPlaylistGenerator.Services
             }
 
             await _context.SaveChangesAsync();
-            
+
             return await GetPlaylistByIdAsync(playlist.Id, userId) ?? playlist;
         }
 

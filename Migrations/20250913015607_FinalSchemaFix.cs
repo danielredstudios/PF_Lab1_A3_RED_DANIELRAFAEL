@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MoodPlaylistGenerator.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class FinalSchemaFix : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,8 +20,8 @@ namespace MoodPlaylistGenerator.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Color = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false)
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Color = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -34,13 +34,9 @@ namespace MoodPlaylistGenerator.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
                     Username = table.Column<string>(type: "TEXT", nullable: false),
                     PasswordHash = table.Column<string>(type: "TEXT", nullable: false),
-                    ResetToken = table.Column<string>(type: "TEXT", nullable: true),
-                    ResetTokenExpiry = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    LastLogin = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -102,13 +98,15 @@ namespace MoodPlaylistGenerator.Migrations
                 name: "PlaylistSongs",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     PlaylistId = table.Column<int>(type: "INTEGER", nullable: false),
                     SongId = table.Column<int>(type: "INTEGER", nullable: false),
                     Position = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PlaylistSongs", x => new { x.PlaylistId, x.SongId });
+                    table.PrimaryKey("PK_PlaylistSongs", x => x.Id);
                     table.ForeignKey(
                         name: "FK_PlaylistSongs_Playlists_PlaylistId",
                         column: x => x.PlaylistId,
@@ -152,12 +150,14 @@ namespace MoodPlaylistGenerator.Migrations
                 columns: new[] { "Id", "Color", "Description", "Name" },
                 values: new object[,]
                 {
-                    { 1, "#FFD700", "Upbeat and energetic songs", "Happy" },
-                    { 2, "#4169E1", "Melancholic and emotional songs", "Sad" },
-                    { 3, "#98FB98", "Calm and soothing songs", "Relaxed" },
-                    { 4, "#FF6347", "High-energy and motivating songs", "Energetic" },
-                    { 5, "#FF69B4", "Love songs and romantic ballads", "Romantic" },
-                    { 6, "#9370DB", "Music for concentration and work", "Focus" }
+                    { 1, "#FFD700", "Upbeat and joyful tunes.", "Happy" },
+                    { 2, "#1E90FF", "Melancholic and emotional songs.", "Sad" },
+                    { 3, "#FF4500", "Fast-paced and high-energy tracks.", "Energetic" },
+                    { 4, "#3CB371", "Relaxing and peaceful music.", "Calm" },
+                    { 5, "#FF69B4", "Love songs and ballads.", "Romantic" },
+                    { 6, "#6A5ACD", "Instrumental or ambient music for concentration.", "Focus" },
+                    { 7, "#DC143C", "Motivational tracks for exercise.", "Workout" },
+                    { 8, "#F08080", "Music to get you dancing.", "Party" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -169,6 +169,11 @@ namespace MoodPlaylistGenerator.Migrations
                 name: "IX_Playlists_UserId",
                 table: "Playlists",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlaylistSongs_PlaylistId",
+                table: "PlaylistSongs",
+                column: "PlaylistId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PlaylistSongs_SongId",

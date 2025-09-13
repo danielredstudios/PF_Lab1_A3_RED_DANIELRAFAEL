@@ -1,23 +1,28 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MoodPlaylistGenerator.Services;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using MoodPlaylistGenerator.Data;
+using MoodPlaylistGenerator.Models;
+using MoodPlaylistGenerator.Services;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using MoodPlaylistGenerator.ViewModels;
 
 namespace MoodPlaylistGenerator.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TestController : ControllerBase
+    public class TestController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly AuthService _authService;
         private readonly SongService _songService;
         private readonly PlaylistService _playlistService;
 
-        public TestController(
-            ApplicationDbContext context,
-            AuthService authService,
-            SongService songService,
-            PlaylistService playlistService)
+        public TestController(ApplicationDbContext context, AuthService authService, SongService songService, PlaylistService playlistService)
         {
             _context = context;
             _authService = authService;
@@ -25,156 +30,171 @@ namespace MoodPlaylistGenerator.Controllers
             _playlistService = playlistService;
         }
 
-        [HttpGet("status")]
-        public IActionResult Status()
+        // GET: Test
+        public async Task<IActionResult> Index()
         {
-            return Ok(new { 
-                message = "Backend is running!",
-                database = "Connected",
-                timestamp = DateTime.Now
-            });
+            return View(await _context.Users.ToListAsync());
         }
 
-        [HttpGet("moods")]
-        public async Task<IActionResult> GetMoods()
+        // GET: Test/Details/5
+        public async Task<IActionResult> Details(int? id)
         {
-            try
+            if (id == null)
             {
-                var moods = await _songService.GetAllMoodsAsync();
-                return Ok(moods);
+                return NotFound();
             }
-            catch (Exception ex)
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
             {
-                return StatusCode(500, new { error = ex.Message });
+                return NotFound();
             }
+
+            return View(user);
         }
 
-        [HttpPost("test-user")]
-        public async Task<IActionResult> CreateTestUser()
+        // GET: Test/Create
+        public IActionResult Create()
         {
-            try
+            return View();
+        }
+
+        // POST: Test/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,Username,PasswordHash,CreatedAt")] User user)
+        {
+            if (ModelState.IsValid)
             {
-                var user = await _authService.RegisterAsync("test@test.com", "testuser", "password123");
-                if (user == null)
+                _context.Add(user);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(user);
+        }
+
+        // GET: Test/Login
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        // POST: Test/Login
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var (user, error) = await _authService.SignInUserAsync(model.Username, model.Password);
+
+                if (user != null)
                 {
-                    return BadRequest(new { error = "User already exists" });
+                    await SignInUser(user.Username, user.Id);
+                    return RedirectToAction("Dashboard", "Home");
                 }
-                return Ok(new { 
-                    message = "Test user created successfully",
-                    userId = user.Id,
-                    email = user.Email,
-                    username = user.Username
-                });
+                ModelState.AddModelError("", error ?? "Invalid login attempt.");
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-            }
+            return View(model);
         }
 
-        [HttpPost("test-song")]
-        public async Task<IActionResult> CreateTestSong()
+        private async Task SignInUser(string username, int userId)
         {
-            try
+            var claims = new List<Claim>
             {
-                // First try to get or create a test user
-                var user = await _authService.LoginAsync("testuser", "password123");
-                if (user == null)
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity));
+        }
+
+        // GET: Test/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return View(user);
+        }
+
+        // POST: Test/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,PasswordHash,CreatedAt")] User user)
+        {
+            if (id != user.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
                 {
-                    user = await _authService.RegisterAsync("test2@test.com", "testuser2", "password123");
-                    if (user == null)
+                    _context.Update(user);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UserExists(user.Id))
                     {
-                        return BadRequest(new { error = "Cannot create test user" });
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
                     }
                 }
-
-                // Create test song with Happy mood (ID = 1)
-                var song = await _songService.CreateSongAsync(
-                    "Test Song",
-                    "Test Artist", 
-                    "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-                    user.Id,
-                    new List<int> { 1, 3 } // Happy and Relaxed moods
-                );
-
-                return Ok(new {
-                    message = "Test song created successfully",
-                    songId = song.Id,
-                    title = song.Title,
-                    artist = song.Artist,
-                    moods = song.SongMoods.Select(sm => sm.Mood.Name).ToList()
-                });
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-            }
+            return View(user);
         }
 
-        [HttpPost("test-playlist")]
-        public async Task<IActionResult> CreateTestPlaylist()
+        // GET: Test/Delete/5
+        public async Task<IActionResult> Delete(int? id)
         {
-            try
+            if (id == null)
             {
-                // Try to get test user
-                var user = await _authService.LoginAsync("testuser2", "password123");
-                if (user == null)
-                {
-                    return BadRequest(new { error = "Test user not found. Create test song first." });
-                }
-
-                // Generate playlist for Happy mood (ID = 1)
-                var playlist = await _playlistService.GeneratePlaylistAsync(
-                    user.Id, 
-                    1, // Happy mood
-                    5, 
-                    "Test Playlist"
-                );
-
-                return Ok(new {
-                    message = "Test playlist created successfully",
-                    playlistId = playlist.Id,
-                    name = playlist.Name,
-                    mood = playlist.Mood.Name,
-                    songCount = playlist.PlaylistSongs.Count,
-                    songs = playlist.PlaylistSongs
-                        .OrderBy(ps => ps.Position)
-                        .Select(ps => new { 
-                            title = ps.Song.Title,
-                            artist = ps.Song.Artist,
-                            position = ps.Position
-                        })
-                        .ToList()
-                });
+                return NotFound();
             }
-            catch (Exception ex)
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
             {
-                return StatusCode(500, new { error = ex.Message });
+                return NotFound();
             }
+
+            return View(user);
         }
 
-        [HttpGet("database-info")]
-        public IActionResult GetDatabaseInfo()
+        // POST: Test/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            try
-            {
-                var userCount = _context.Users.Count();
-                var songCount = _context.Songs.Count();
-                var moodCount = _context.Moods.Count();
-                var playlistCount = _context.Playlists.Count();
+            var user = await _context.Users.FindAsync(id);
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
 
-                return Ok(new {
-                    users = userCount,
-                    songs = songCount,
-                    moods = moodCount,
-                    playlists = playlistCount,
-                    databaseLocation = "MoodPlaylist.db"
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-            }
+        private bool UserExists(int id)
+        {
+            return _context.Users.Any(e => e.Id == id);
         }
     }
 }

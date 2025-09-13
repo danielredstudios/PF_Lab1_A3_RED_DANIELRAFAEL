@@ -5,55 +5,27 @@ namespace MoodPlaylistGenerator.ViewModels
     public class RegisterViewModel
     {
         [Required]
-        [EmailAddress]
-        public string Email { get; set; } = string.Empty;
-
-        [Required]
         [StringLength(50, MinimumLength = 3)]
-        public string Username { get; set; } = string.Empty;
+        public string Username { get; set; } = "";
 
         [Required]
+        [DataType(DataType.Password)]
         [StringLength(100, MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        public string Password { get; set; } = string.Empty;
+        public string Password { get; set; } = "";
 
-        [Required]
-        [Compare("Password", ErrorMessage = "Passwords don't match.")]
         [DataType(DataType.Password)]
-        public string ConfirmPassword { get; set; } = string.Empty;
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; } = "";
     }
 
     public class LoginViewModel
     {
         [Required]
-        public string EmailOrUsername { get; set; } = string.Empty;
+        public string Username { get; set; } = "";
 
         [Required]
         [DataType(DataType.Password)]
-        public string Password { get; set; } = string.Empty;
-
-        public bool RememberMe { get; set; }
-    }
-
-    public class ForgotPasswordViewModel
-    {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; } = string.Empty;
-    }
-
-    public class ResetPasswordViewModel
-    {
-        public string Token { get; set; } = string.Empty;
-
-        [Required]
-        [StringLength(100, MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        public string Password { get; set; } = string.Empty;
-
-        [Required]
-        [Compare("Password", ErrorMessage = "Passwords don't match.")]
-        [DataType(DataType.Password)]
-        public string ConfirmPassword { get; set; } = string.Empty;
+        public string Password { get; set; } = "";
     }
 }

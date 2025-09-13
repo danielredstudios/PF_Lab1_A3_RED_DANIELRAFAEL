@@ -1,7 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
+<<<<<<< Updated upstream
 VisualStudioVersion = 17.14.36408.4 d17.14
+=======
+VisualStudioVersion = 17.14.36310.24
+>>>>>>> Stashed changes
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoodPlaylistGenerator", "MoodPlaylistGenerator.csproj", "{8D5F83DE-A29F-737B-BE4F-8D77763EB2AD}"
 EndProject
@@ -20,6 +24,10 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
+<<<<<<< Updated upstream
 		SolutionGuid = {5FC4CEB9-CEDF-44FC-8770-E646349882FE}
+=======
+		SolutionGuid = {3595735B-0D56-469F-B1A3-80E2D15CA203}
+>>>>>>> Stashed changes
 	EndGlobalSection
 EndGlobal

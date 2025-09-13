@@ -36,7 +36,7 @@ namespace MoodPlaylistGenerator.Controllers
             // Filter by search term
             if (!string.IsNullOrEmpty(search))
             {
-                songs = songs.Where(s => 
+                songs = songs.Where(s =>
                     s.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                     s.Artist.Contains(search, StringComparison.OrdinalIgnoreCase))
                     .ToList();
@@ -57,7 +57,7 @@ namespace MoodPlaylistGenerator.Controllers
         {
             var userId = GetCurrentUserId();
             var song = await _songService.GetSongByIdAsync(id, userId);
-            
+
             if (song == null)
                 return NotFound();
 
@@ -92,18 +92,18 @@ namespace MoodPlaylistGenerator.Controllers
             }
 
             var userId = GetCurrentUserId();
-            
+
             try
             {
                 await _songService.CreateSongAsync(
-                    model.Title, 
-                    model.Artist, 
-                    model.YouTubeUrl, 
-                    userId, 
+                    model.Title,
+                    model.Artist,
+                    model.YouTubeUrl,
+                    userId,
                     model.SelectedMoodIds);
 
                 TempData["SuccessMessage"] = "Song added successfully!";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Dashboard", "Home");
             }
             catch (Exception)
             {
@@ -118,7 +118,7 @@ namespace MoodPlaylistGenerator.Controllers
         {
             var userId = GetCurrentUserId();
             var song = await _songService.GetSongByIdAsync(id, userId);
-            
+
             if (song == null)
                 return NotFound();
 
@@ -145,15 +145,15 @@ namespace MoodPlaylistGenerator.Controllers
             }
 
             var userId = GetCurrentUserId();
-            
+
             try
             {
                 var updatedSong = await _songService.UpdateSongAsync(
-                    model.Id, 
-                    userId, 
-                    model.Title, 
-                    model.Artist, 
-                    model.YouTubeUrl, 
+                    model.Id,
+                    userId,
+                    model.Title,
+                    model.Artist,
+                    model.YouTubeUrl,
                     model.SelectedMoodIds);
 
                 if (updatedSong == null)
@@ -175,7 +175,7 @@ namespace MoodPlaylistGenerator.Controllers
         {
             var userId = GetCurrentUserId();
             var success = await _songService.DeleteSongAsync(id, userId);
-            
+
             if (!success)
                 return NotFound();
 

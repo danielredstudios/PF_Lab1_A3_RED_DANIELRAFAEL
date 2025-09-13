@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 @model MoodPlaylistGenerator.ViewModels.SongDetailViewModel
 @{
     ViewData["Title"] = Model.Song.Title;
@@ -112,3 +113,47 @@
         <i class="fas fa-arrow-left"></i> Back to Songs
     </a>
 </div>
+=======
+﻿@model MoodPlaylistGenerator.ViewModels.SongDetailViewModel
+@{
+    ViewData["Title"] = "Song Details";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0"><i class="fas fa-compact-disc me-2"></i>@Model.Song.Title</h2>
+                <p class="mb-0 text-muted">by @Model.Song.Artist</p>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(Model.YouTubeVideoId))
+                {
+                    <div class="ratio ratio-16x9 mb-4">
+                        <iframe src="https://www.youtube.com/embed/@Model.YouTubeVideoId" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                }
+
+                <h5 class="mt-4">Moods</h5>
+                @if (Model.AssignedMoods.Any())
+                {
+                    <div>
+                        @foreach (var mood in Model.AssignedMoods)
+                        {
+                            <span class="badge me-1" style="background-color: @mood.Color;">@mood.Name</span>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No moods assigned to this song.</p>
+                }
+            </div>
+            <div class="card-footer d-flex justify-content-end">
+                <a href="@Url.Action("Index", "Songs")" class="btn btn-secondary me-2">Back to List</a>
+                <a href="@Url.Action("Edit", "Songs", new { id = Model.Song.Id })" class="btn btn-primary">Edit Song</a>
+            </div>
+        </div>
+    </div>
+</div>
+>>>>>>> Stashed changes

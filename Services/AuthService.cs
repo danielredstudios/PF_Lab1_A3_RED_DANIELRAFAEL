@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MoodPlaylistGenerator.Data;
 using MoodPlaylistGenerator.Models;
-using BCrypt.Net;
 
 namespace MoodPlaylistGenerator.Services
 {
@@ -14,8 +13,9 @@ namespace MoodPlaylistGenerator.Services
             _context = context;
         }
 
-        public async Task<User?> RegisterAsync(string email, string username, string password)
+        public async Task<(User?, string?)> RegisterUserAsync(string username, string password)
         {
+<<<<<<< Updated upstream
             // Check if user exists
             var existingUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == email || u.Username == username);
@@ -25,68 +25,35 @@ namespace MoodPlaylistGenerator.Services
 
             // Hash password
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+=======
+            if (await _context.Users.AnyAsync(u => u.Username == username))
+            {
+                return (null, "Username already exists.");
+            }
+>>>>>>> Stashed changes
 
             var user = new User
             {
-                Email = email,
                 Username = username,
-                PasswordHash = passwordHash,
-                CreatedAt = DateTime.UtcNow
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(password)
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return user;
+            return (user, null);
         }
 
-        public async Task<User?> LoginAsync(string emailOrUsername, string password)
+        public async Task<(User?, string?)> SignInUserAsync(string username, string password)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == emailOrUsername || u.Username == emailOrUsername);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-                return null;
+            {
+                return (null, "Invalid username or password.");
+            }
 
-            // Update last login
-            user.LastLogin = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-
-            return user;
-        }
-
-        public async Task<bool> InitiatePasswordResetAsync(string email)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null)
-                return false;
-
-            // Generate reset token
-            user.ResetToken = Guid.NewGuid().ToString();
-            user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
-
-            await _context.SaveChangesAsync();
-
-            // In a real app, send email here
-            // For now, just return true
-            return true;
-        }
-
-        public async Task<bool> ResetPasswordAsync(string token, string newPassword)
-        {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.ResetToken == token && u.ResetTokenExpiry > DateTime.UtcNow);
-
-            if (user == null)
-                return false;
-
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
-            user.ResetToken = null;
-            user.ResetTokenExpiry = null;
-
-            await _context.SaveChangesAsync();
-
-            return true;
+            return (user, null);
         }
     }
 }

@@ -49,7 +49,7 @@ namespace MoodPlaylistGenerator.Controllers
         {
             var userId = GetCurrentUserId();
             var playlist = await _playlistService.GetPlaylistByIdAsync(id, userId);
-            
+
             if (playlist == null)
                 return NotFound();
 
@@ -94,9 +94,9 @@ namespace MoodPlaylistGenerator.Controllers
             {
                 var userId = GetCurrentUserId();
                 var playlist = await _playlistService.GeneratePlaylistAsync(
-                    userId, 
-                    model.SelectedMoodId, 
-                    model.SongCount, 
+                    userId,
+                    model.SelectedMoodId,
+                    model.SongCount,
                     model.PlaylistName);
 
                 TempData["SuccessMessage"] = "Playlist generated successfully!";
@@ -131,7 +131,7 @@ namespace MoodPlaylistGenerator.Controllers
 
             var userId = GetCurrentUserId();
             var playlist = await _playlistService.UpdatePlaylistNameAsync(model.PlaylistId, userId, model.Name);
-            
+
             if (playlist == null)
                 return NotFound();
 
@@ -144,7 +144,7 @@ namespace MoodPlaylistGenerator.Controllers
         {
             var userId = GetCurrentUserId();
             var success = await _playlistService.DeletePlaylistAsync(id, userId);
-            
+
             if (!success)
                 return NotFound();
 

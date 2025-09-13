@@ -44,43 +44,57 @@ namespace MoodPlaylistGenerator.Migrations
                         {
                             Id = 1,
                             Color = "#FFD700",
-                            Description = "Upbeat and energetic songs",
+                            Description = "Upbeat and joyful tunes.",
                             Name = "Happy"
                         },
                         new
                         {
                             Id = 2,
-                            Color = "#4169E1",
-                            Description = "Melancholic and emotional songs",
+                            Color = "#1E90FF",
+                            Description = "Melancholic and emotional songs.",
                             Name = "Sad"
                         },
                         new
                         {
                             Id = 3,
-                            Color = "#98FB98",
-                            Description = "Calm and soothing songs",
-                            Name = "Relaxed"
+                            Color = "#FF4500",
+                            Description = "Fast-paced and high-energy tracks.",
+                            Name = "Energetic"
                         },
                         new
                         {
                             Id = 4,
-                            Color = "#FF6347",
-                            Description = "High-energy and motivating songs",
-                            Name = "Energetic"
+                            Color = "#3CB371",
+                            Description = "Relaxing and peaceful music.",
+                            Name = "Calm"
                         },
                         new
                         {
                             Id = 5,
                             Color = "#FF69B4",
-                            Description = "Love songs and romantic ballads",
+                            Description = "Love songs and ballads.",
                             Name = "Romantic"
                         },
                         new
                         {
                             Id = 6,
-                            Color = "#9370DB",
-                            Description = "Music for concentration and work",
+                            Color = "#6A5ACD",
+                            Description = "Instrumental or ambient music for concentration.",
                             Name = "Focus"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Color = "#DC143C",
+                            Description = "Motivational tracks for exercise.",
+                            Name = "Workout"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Color = "#F08080",
+                            Description = "Music to get you dancing.",
+                            Name = "Party"
                         });
                 });
 
@@ -114,16 +128,22 @@ namespace MoodPlaylistGenerator.Migrations
 
             modelBuilder.Entity("MoodPlaylistGenerator.Models.PlaylistSong", b =>
                 {
-                    b.Property<int>("PlaylistId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("SongId")
+                    b.Property<int>("PlaylistId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Position")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("PlaylistId", "SongId");
+                    b.Property<int>("SongId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlaylistId");
 
                     b.HasIndex("SongId");
 
@@ -185,21 +205,8 @@ namespace MoodPlaylistGenerator.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("LastLogin")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ResetToken")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ResetTokenExpiry")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Username")

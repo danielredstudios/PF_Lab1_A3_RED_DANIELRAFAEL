@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 @model MoodPlaylistGenerator.ViewModels.CreateSongViewModel
+=======
+﻿@model MoodPlaylistGenerator.ViewModels.CreateSongViewModel
+>>>>>>> Stashed changes
 @{
     ViewData["Title"] = "Add New Song";
 }
@@ -7,6 +11,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
+<<<<<<< Updated upstream
                 <h3>🎵 Add New Song</h3>
             </div>
             <div class="card-body">
@@ -65,6 +70,40 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-plus"></i> Add Song
                         </button>
+=======
+                <h2 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Add a New Song</h2>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label">Song Title</label>
+                        <input asp-for="Title" class="form-control" placeholder="e.g., Bohemian Rhapsody">
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Artist" class="form-label">Artist</label>
+                        <input asp-for="Artist" class="form-control" placeholder="e.g., Queen">
+                        <span asp-validation-for="Artist" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="YouTubeUrl" class="form-label">YouTube URL</label>
+                        <input asp-for="YouTubeUrl" class="form-control" placeholder="e.g., https://www.youtube.com/watch?v=fJ9rUzIMcZQ">
+                        <span asp-validation-for="YouTubeUrl" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SelectedMoodIds" class="form-label">Moods (Hold Ctrl/Cmd to select multiple)</label>
+                        <select asp-for="SelectedMoodIds" class="form-control" asp-items="@(new SelectList(Model.AvailableMoods, "Id", "Name"))" multiple style="height: 150px;"></select>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="@Url.Action("Index", "Songs")" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Song</button>
+>>>>>>> Stashed changes
                     </div>
                 </form>
             </div>
@@ -73,5 +112,12 @@
 </div>
 
 @section Scripts {
+<<<<<<< Updated upstream
     <partial name="_ValidationScriptsPartial" />
 }
+=======
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+>>>>>>> Stashed changes

@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 @model MoodPlaylistGenerator.ViewModels.PlaylistDetailViewModel
 @{
     ViewData["Title"] = Model.Playlist.Name;
@@ -389,3 +390,50 @@
         </div>
     </div>
 </div>
+=======
+﻿@model MoodPlaylistGenerator.ViewModels.PlaylistDetailViewModel
+@{
+    ViewData["Title"] = "Playlist Details";
+}
+
+<div class="container">
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h2 class="mb-0">✨ @Model.Playlist.Name</h2>
+            <p class="mb-0">
+                A playlist for when you're feeling:
+                <span class="badge" style="background-color: @Model.Playlist.Mood.Color;">@Model.Playlist.Mood.Name</span>
+            </p>
+        </div>
+        <div class="card-body">
+            @if (Model.Songs.Any())
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var playlistSong in Model.Songs)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1">@playlistSong.Position. @playlistSong.Song.Title</h5>
+                                <p class="mb-1 text-muted">by @playlistSong.Song.Artist</p>
+                            </div>
+                            <a href="@playlistSong.Song.YouTubeUrl" class="btn btn-sm btn-danger" target="_blank">
+                                <i class="fab fa-youtube"></i> Watch
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <div class="text-center p-4">
+                    <p class="text-muted">This playlist is currently empty.</p>
+                </div>
+            }
+        </div>
+        <div class="card-footer text-center">
+            <a href="@Url.Action("Index", "Playlists")" class="btn btn-secondary">Back to All Playlists</a>
+            <a href="@Url.Action("Generate", "Playlists")" class="btn btn-primary">Generate Another</a>
+        </div>
+    </div>
+</div>
+>>>>>>> Stashed changes

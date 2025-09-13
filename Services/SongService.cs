@@ -32,8 +32,12 @@ namespace MoodPlaylistGenerator.Services
                 .FirstOrDefaultAsync(s => s.Id == songId && s.UserId == userId);
         }
 
+        // ===============================================================
+        // START: Corrected CreateSongAsync Method
+        // ===============================================================
         public async Task<Song> CreateSongAsync(string title, string artist, string youtubeUrl, int userId, List<int> moodIds)
         {
+            // 1. Create the new Song object
             var song = new Song
             {
                 Title = title,
@@ -43,25 +47,27 @@ namespace MoodPlaylistGenerator.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            _context.Songs.Add(song);
-            await _context.SaveChangesAsync();
-
-            // Add mood associations
-            if (moodIds.Any())
+            // 2. If moods were selected, create the SongMood objects and add them
+            //    directly to the song's navigation property.
+            if (moodIds != null && moodIds.Any())
             {
                 foreach (var moodId in moodIds)
                 {
-                    _context.SongMoods.Add(new SongMood
-                    {
-                        SongId = song.Id,
-                        MoodId = moodId
-                    });
+                    song.SongMoods.Add(new SongMood { MoodId = moodId });
                 }
-                await _context.SaveChangesAsync();
             }
 
-            return await GetSongByIdAsync(song.Id, userId) ?? song;
+            // 3. Add the complete song object (with its moods) to the context.
+            _context.Songs.Add(song);
+
+            // 4. Save everything in a single transaction.
+            await _context.SaveChangesAsync();
+
+            return song;
         }
+        // ===============================================================
+        // END: Corrected CreateSongAsync Method
+        // ===============================================================
 
         public async Task<Song?> UpdateSongAsync(int songId, int userId, string title, string artist, string youtubeUrl, List<int> moodIds)
         {
@@ -124,14 +130,13 @@ namespace MoodPlaylistGenerator.Services
 
         public string ExtractYouTubeVideoId(string url)
         {
-            // Extract video ID from various YouTube URL formats
             var uri = new Uri(url);
-            
+
             if (uri.Host.Contains("youtu.be"))
             {
                 return uri.AbsolutePath.TrimStart('/');
             }
-            
+
             if (uri.Host.Contains("youtube.com"))
             {
                 var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
